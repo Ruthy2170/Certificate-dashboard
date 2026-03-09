@@ -9,20 +9,29 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.SubmitEvent) => {
         e.preventDefault();
-        // Mock login - in a real app, this would validate credentials
-        if (email && password) {
-            authService.login(email, password).then((result) => {
-                if (result.success) {
-                    localStorage.setItem("userEmail", email);
-                    navigate("/");
-                } else {
-                    alert(result.error);
-                }
-            });
-        } else {
+        if (!email || !password) {
             alert("Please enter your email and password");
+            return;
+        }
+
+        try {
+            const response = await authService.login(email, password);
+
+            if (response.success) {
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify(response.data.user),
+                );
+                navigate("/");
+            } else {
+                alert(response.error);
+            }
+        } catch (error) {
+            console.error("Login failed:", error);
+            alert("Something went wrong");
         }
     };
 

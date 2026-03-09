@@ -8,25 +8,25 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
-  {
-    path: "/login",
-    Component: LoginPage,
-  },
-  {
-    path: "/signup",
-    Component: SignUpPage,
-  },
-  {
-    path: "/",
-    element: (
-      <ProtectedRoute>
-        <Layout />
-      </ProtectedRoute>
-    ),
-    children: [
-      { index: true, Component: Dashboard },
-      { path: "certificates", Component: CertificatesPage },
-      { path: "profile", Component: ProfilePage },
-    ],
-  },
+    {
+        path: "/login",
+        element: <LoginPage />,
+    },
+    {
+        path: "/signup",
+        element: <SignUpPage />,
+    },
+    {
+        path: "/",
+        element: (
+            <ProtectedRoute>
+                <Layout />
+            </ProtectedRoute>
+        ),
+        children: [
+            { index: true, Component: Dashboard },
+            { path: "certificates", Component: CertificatesPage },
+            { path: "profile", Component: ProfilePage },
+        ],
+    },
 ]);

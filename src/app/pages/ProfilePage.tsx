@@ -1,217 +1,252 @@
-import { User, Mail, Phone, MapPin, Calendar, Save, Camera, Edit2 } from 'lucide-react';
-import { useState } from 'react';
+import {
+    User,
+    Mail,
+    Phone,
+    MapPin,
+    Calendar,
+    Save,
+    Camera,
+    Edit2,
+} from "lucide-react";
+import { useState } from "react";
+import { format } from "date-fns";
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
 
 export default function ProfilePage() {
-  const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: 'Ruth',
-    email: 'ruth@amabaniafrica.com',
-    phone: '+234 801 234 5678',
-    location: 'Lagos, Nigeria',
-    bio: 'Passionate learner dedicated to continuous growth and professional development.',
-    joinDate: 'November 15, 2025',
-    avatar: 'https://images.unsplash.com/photo-1649589244330-09ca58e4fa64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjB3b21hbiUyMHBvcnRyYWl0fGVufDF8fHx8MTc3MjU4MzU1N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  });
+    const [isEditing, setIsEditing] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
-    setProfileData(prev => ({ ...prev, [field]: value }));
-  };
+    const handleInputChange = (field: string, value: string) => {
+        // setProfileData((prev) => ({ ...prev, [field]: value }));
+    };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // In a real app, this would save to a backend
-    alert('Profile updated successfully!');
-  };
+    const handleSave = () => {
+        setIsEditing(false);
+        // In a real app, this would save to a backend
+        alert("Profile updated successfully!");
+    };
 
-  return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-600">Manage your personal information and preferences</p>
-      </div>
+    const formateDate = (date: Date) => {
+        const formattedDate = format(date, "LLLL dd, yyyy");
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        {/* Profile Card */}
-        <div className="lg:col-span-1">
-          <div className="rounded-2xl bg-white p-6 shadow-lg">
-            <div className="mb-6 flex flex-col items-center">
-              <div className="relative mb-4">
-                <img
-                  src={profileData.avatar}
-                  alt={profileData.name}
-                  className="size-32 rounded-full border-4 border-blue-100 object-cover shadow-lg"
-                />
-                <button className="absolute bottom-0 right-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 p-2 text-white shadow-lg transition-all hover:shadow-xl">
-                  <Camera className="size-4" />
-                </button>
-              </div>
-              <h2 className="mb-1 text-xl font-bold text-gray-900">{profileData.name}</h2>
-              <p className="mb-4 text-sm text-gray-600">{profileData.email}</p>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar className="size-4" />
-                <span>Joined {profileData.joinDate}</span>
-              </div>
+        return formattedDate;
+    };
+
+    return (
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="mb-2 text-3xl font-bold text-gray-900">
+                    My Profile
+                </h1>
+                <p className="text-gray-600">
+                    Manage your personal information and preferences
+                </p>
             </div>
 
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl"
-            >
-              <Edit2 className="size-4" />
-              {isEditing ? 'Cancel Editing' : 'Edit Profile'}
-            </button>
-          </div>
+            <div className="grid gap-8 lg:grid-cols-3">
+                {/* Profile Card */}
+                <div className="lg:col-span-1">
+                    <div className="rounded-2xl bg-white p-6 shadow-lg">
+                        <div className="mb-6 flex flex-col items-center">
+                            <div className="relative mb-4">
+                                <img
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    className="size-32 rounded-full border-4 border-blue-100 object-cover shadow-lg"
+                                />
+                                <button className="absolute bottom-0 right-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 p-2 text-white shadow-lg transition-all hover:shadow-xl">
+                                    <Camera className="size-4" />
+                                </button>
+                            </div>
+                            <h2 className="mb-1 text-xl font-bold text-gray-900">
+                                {user.name}
+                            </h2>
+                            <p className="mb-4 text-sm text-gray-600">
+                                {user.email}
+                            </p>
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                <Calendar className="size-4" />
+                                <span>
+                                    Joined {formateDate(user.createdAt)}
+                                </span>
+                            </div>
+                        </div>
 
-          {/* Stats Card */}
-          <div className="mt-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white shadow-lg">
-            <h3 className="mb-4 font-semibold">Learning Stats</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-blue-100">Certificates</span>
-                <span className="text-xl font-bold">4</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-blue-100">Total Points</span>
-                <span className="text-xl font-bold">2,450</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-blue-100">Current Streak</span>
-                <span className="text-xl font-bold">15 days</span>
-              </div>
+                        <button
+                            onClick={() => setIsEditing(!isEditing)}
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl"
+                        >
+                            <Edit2 className="size-4" />
+                            {isEditing ? "Cancel Editing" : "Edit Profile"}
+                        </button>
+                    </div>
+
+                    {/* Stats Card */}
+                    <div className="mt-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white shadow-lg">
+                        <h3 className="mb-4 font-semibold">Learning Stats</h3>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-blue-100">
+                                    Certificates
+                                </span>
+                                <span className="text-xl font-bold">4</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-blue-100">
+                                    Current Streak
+                                </span>
+                                <span className="text-xl font-bold">
+                                    15 days
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Profile Form */}
+                <div className="lg:col-span-2">
+                    <div className="rounded-2xl bg-white p-8 shadow-lg">
+                        <div className="mb-6 flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-gray-900">
+                                Personal Information
+                            </h2>
+                            {isEditing && (
+                                <button
+                                    onClick={handleSave}
+                                    className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700"
+                                >
+                                    <Save className="size-4" />
+                                    Save Changes
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Full Name */}
+                            <div>
+                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <User className="size-4" />
+                                    Full Name
+                                </label>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        value={user.name}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "name",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    />
+                                ) : (
+                                    <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
+                                        {user.name}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Email */}
+                            <div>
+                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <Mail className="size-4" />
+                                    Email Address
+                                </label>
+                                {isEditing ? (
+                                    <input
+                                        type="email"
+                                        value={user.email}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "email",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    />
+                                ) : (
+                                    <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
+                                        {user.email}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Phone */}
+                            <div>
+                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <Phone className="size-4" />
+                                    Phone Number
+                                </label>
+                                {isEditing ? (
+                                    <input
+                                        type="tel"
+                                        value={user.phone}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "phone",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    />
+                                ) : (
+                                    <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
+                                        {user.phone}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Location */}
+                            <div>
+                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                    <MapPin className="size-4" />
+                                    Location
+                                </label>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        value={user.province}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "location",
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    />
+                                ) : (
+                                    <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
+                                        {user.province}, {user.country}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Account Settings */}
+                    <div className="mt-6 rounded-2xl bg-white p-8 shadow-lg">
+                        <h2 className="mb-6 text-xl font-bold text-gray-900">
+                            Account Settings
+                        </h2>
+                        <div className="space-y-4">
+                            <button className="w-full rounded-lg border border-gray-300 px-4 py-3 text-left font-medium text-gray-700 transition-all hover:border-blue-500 hover:bg-blue-50">
+                                Change Password
+                            </button>
+                            <button className="w-full rounded-lg border border-gray-300 px-4 py-3 text-left font-medium text-gray-700 transition-all hover:border-blue-500 hover:bg-blue-50">
+                                Notification Preferences
+                            </button>
+                            <button className="w-full rounded-lg border border-gray-300 px-4 py-3 text-left font-medium text-gray-700 transition-all hover:border-blue-500 hover:bg-blue-50">
+                                Privacy Settings
+                            </button>
+                            <button className="w-full rounded-lg border border-red-300 px-4 py-3 text-left font-medium text-red-600 transition-all hover:bg-red-50">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-
-        {/* Profile Form */}
-        <div className="lg:col-span-2">
-          <div className="rounded-2xl bg-white p-8 shadow-lg">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">Personal Information</h2>
-              {isEditing && (
-                <button
-                  onClick={handleSave}
-                  className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700"
-                >
-                  <Save className="size-4" />
-                  Save Changes
-                </button>
-              )}
-            </div>
-
-            <div className="space-y-6">
-              {/* Full Name */}
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <User className="size-4" />
-                  Full Name
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={profileData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                ) : (
-                  <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">{profileData.name}</p>
-                )}
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Mail className="size-4" />
-                  Email Address
-                </label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    value={profileData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                ) : (
-                  <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">{profileData.email}</p>
-                )}
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Phone className="size-4" />
-                  Phone Number
-                </label>
-                {isEditing ? (
-                  <input
-                    type="tel"
-                    value={profileData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                ) : (
-                  <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">{profileData.phone}</p>
-                )}
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <MapPin className="size-4" />
-                  Location
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={profileData.location}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                ) : (
-                  <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">{profileData.location}</p>
-                )}
-              </div>
-
-              {/* Bio */}
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <Edit2 className="size-4" />
-                  Bio
-                </label>
-                {isEditing ? (
-                  <textarea
-                    value={profileData.bio}
-                    onChange={(e) => handleInputChange('bio', e.target.value)}
-                    rows={4}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                ) : (
-                  <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">{profileData.bio}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Account Settings */}
-          <div className="mt-6 rounded-2xl bg-white p-8 shadow-lg">
-            <h2 className="mb-6 text-xl font-bold text-gray-900">Account Settings</h2>
-            <div className="space-y-4">
-              <button className="w-full rounded-lg border border-gray-300 px-4 py-3 text-left font-medium text-gray-700 transition-all hover:border-blue-500 hover:bg-blue-50">
-                Change Password
-              </button>
-              <button className="w-full rounded-lg border border-gray-300 px-4 py-3 text-left font-medium text-gray-700 transition-all hover:border-blue-500 hover:bg-blue-50">
-                Notification Preferences
-              </button>
-              <button className="w-full rounded-lg border border-gray-300 px-4 py-3 text-left font-medium text-gray-700 transition-all hover:border-blue-500 hover:bg-blue-50">
-                Privacy Settings
-              </button>
-              <button className="w-full rounded-lg border border-red-300 px-4 py-3 text-left font-medium text-red-600 transition-all hover:bg-red-50">
-                Delete Account
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
