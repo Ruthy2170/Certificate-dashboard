@@ -23,9 +23,8 @@ const userData = {
 };
 
 const navigationItems = [
-    { id: 1, name: "Dashboard", icon: LayoutDashboard, path: "/" },
-    { id: 2, name: "Certifications", icon: Shield, path: "/certificates" },
-    { id: 3, name: "Profile", icon: User, path: "/profile" },
+    { id: 1, name: "Certifications", icon: Shield, path: "/" },
+    { id: 2, name: "Profile", icon: User, path: "/profile" },
 ];
 
 export default function Layout() {
