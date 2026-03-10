@@ -49,8 +49,12 @@ export default function Layout() {
                     {/* Logo/Brand */}
                     <div className="flex items-center justify-between p-6">
                         <div className="flex items-center gap-3">
-                            <div className="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 p-2.5 shadow-lg">
-                                <Trophy className="size-7 text-white" />
+                            <div className="rounded-xl bg-white p-2">
+                                <img
+                                    src="/ambani-logo.png"
+                                    alt="Logo"
+                                    className="size-8"
+                                />
                             </div>
                             <div>
                                 <span className="block text-lg font-bold text-gray-900">
