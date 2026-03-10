@@ -27,7 +27,7 @@ const authService = {
         }
     },
 
-    signup: async (name, email, Phone, password) => {
+    signup: async (name, email, phone, password) => {
         try {
             const { signup: SIGNUP_URL } = ENDPOINTS;
 
