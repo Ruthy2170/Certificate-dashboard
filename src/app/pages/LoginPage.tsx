@@ -10,6 +10,7 @@ export default function LoginPage() {
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.SubmitEvent) => {
+        console.log("Attempting login with:");
         e.preventDefault();
         if (!email || !password) {
             alert("Please enter your email and password");
@@ -18,6 +19,7 @@ export default function LoginPage() {
 
         try {
             const response = await authService.login(email, password);
+            console.log("Login response:", response);
 
             if (response.success) {
                 localStorage.setItem("token", response.data.token);

@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router";
-import Dashboard from "./pages/Dashboard";
 import CertificatesPage from "./pages/CertificatesPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
@@ -24,8 +23,8 @@ export const router = createBrowserRouter([
             </ProtectedRoute>
         ),
         children: [
-            { index: true, Component: Dashboard },
-            { path: "certificates", Component: CertificatesPage },
+            { index: true, Component: CertificatesPage },
+            // { path: "certificates", Component: CertificatesPage },
             { path: "profile", Component: ProfilePage },
         ],
     },

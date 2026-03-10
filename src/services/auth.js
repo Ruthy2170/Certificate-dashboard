@@ -5,6 +5,7 @@ const authService = {
     login: async (email, password) => {
         try {
             const { login: LOGIN_URL } = ENDPOINTS;
+            console.log("Sending login request to:", LOGIN_URL);
 
             const response = await axios.post(LOGIN_URL, {
                 email: email,
