@@ -11,6 +11,8 @@ import {
 import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router";
 
+// logo imported for future use
+
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
 // Mock data
