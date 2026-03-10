@@ -51,7 +51,7 @@ export default function Layout() {
                     {/* Logo/Brand */}
                     <div className="flex items-center justify-between p-6">
                         <div className="flex items-center gap-3">
-                            <div className="rounded-xl p-2.5">
+                            <div className="rounded-xl bg-white p-2">
                                 <img
                                     src="/ambani-logo.png"
                                     alt="Logo"
