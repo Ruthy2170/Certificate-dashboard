@@ -15,13 +15,13 @@ const authService = {
             return {
                 success: response.data.success,
                 data: response.data,
-                error: response.data.error || null,
+                error: response.data.message || null,
             };
         } catch (error) {
             return {
                 success: false,
                 error:
-                    error.response?.data?.error ||
+                    error.response?.data?.message ||
                     error.message ||
                     "Login failed",
             };
