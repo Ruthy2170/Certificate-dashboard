@@ -10,10 +10,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
-
-const user = JSON.parse(localStorage.getItem("user") || "{}");
+import useUserStore from "@/context/userStore";
 
 export default function ProfilePage() {
+    const { user } = useUserStore();
     const [isEditing, setIsEditing] = useState(false);
 
     const handleInputChange = (field: string, value: string) => {
@@ -26,7 +26,7 @@ export default function ProfilePage() {
         alert("Profile updated successfully!");
     };
 
-    const formateDate = (date: Date) => {
+    const formateDate = (date: string) => {
         const formattedDate = format(date, "LLLL dd, yyyy");
 
         return formattedDate;
@@ -51,8 +51,8 @@ export default function ProfilePage() {
                         <div className="mb-6 flex flex-col items-center">
                             <div className="relative mb-4">
                                 <img
-                                    src={user.avatar}
-                                    alt={user.name}
+                                    src={user?.avatar}
+                                    alt={user?.name}
                                     className="size-32 rounded-full border-4 border-blue-100 object-cover shadow-lg"
                                 />
                                 <button className="absolute bottom-0 right-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 p-2 text-white shadow-lg transition-all hover:shadow-xl">
@@ -60,15 +60,18 @@ export default function ProfilePage() {
                                 </button>
                             </div>
                             <h2 className="mb-1 text-xl font-bold text-gray-900">
-                                {user.name}
+                                {user?.name}
                             </h2>
                             <p className="mb-4 text-sm text-gray-600">
-                                {user.email}
+                                {user?.email}
                             </p>
                             <div className="flex items-center gap-2 text-sm text-gray-500">
                                 <Calendar className="size-4" />
                                 <span>
-                                    Joined {formateDate(user.createdAt)}
+                                    Joined{" "}
+                                    {user?.createdAt
+                                        ? formateDate(user?.createdAt)
+                                        : "Unavailable"}
                                 </span>
                             </div>
                         </div>
@@ -132,7 +135,7 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="text"
-                                        value={user.name}
+                                        value={user?.name}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 "name",
@@ -143,7 +146,7 @@ export default function ProfilePage() {
                                     />
                                 ) : (
                                     <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
-                                        {user.name}
+                                        {user?.name}
                                     </p>
                                 )}
                             </div>
@@ -157,7 +160,7 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="email"
-                                        value={user.email}
+                                        value={user?.email}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 "email",
@@ -168,7 +171,7 @@ export default function ProfilePage() {
                                     />
                                 ) : (
                                     <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
-                                        {user.email}
+                                        {user?.email}
                                     </p>
                                 )}
                             </div>
@@ -182,7 +185,7 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="tel"
-                                        value={user.phone}
+                                        value={user?.phone}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 "phone",
@@ -193,7 +196,7 @@ export default function ProfilePage() {
                                     />
                                 ) : (
                                     <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
-                                        {user.phone}
+                                        {user?.phone}
                                     </p>
                                 )}
                             </div>
@@ -207,7 +210,7 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="text"
-                                        value={user.province}
+                                        value={user?.province}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 "location",
@@ -218,7 +221,7 @@ export default function ProfilePage() {
                                     />
                                 ) : (
                                     <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
-                                        {user.province}, {user.country}
+                                        {user?.province}, {user?.country}
                                     </p>
                                 )}
                             </div>

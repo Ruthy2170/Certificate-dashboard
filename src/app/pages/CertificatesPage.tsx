@@ -10,52 +10,60 @@ import {
     Facebook,
     Link,
 } from "lucide-react";
-import { useState } from "react";
-
-const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-const certifications = [
-    {
-        id: 1,
-        name: "Advanced Web Development",
-        organization: "Tech Academy",
-        completionDate: "February 28, 2026",
-        status: "completed",
-        learnerName: user.name,
-        category: "Development",
-    },
-    {
-        id: 2,
-        name: "Cloud Architecture Professional",
-        organization: "Cloud Certification Board",
-        completionDate: "January 15, 2026",
-        status: "completed",
-        learnerName: user.name,
-        category: "Cloud",
-    },
-    {
-        id: 3,
-        name: "UX Design Specialist",
-        organization: "Design Institute",
-        completionDate: "March 2, 2026",
-        status: "completed",
-        learnerName: user.name,
-        category: "Design",
-    },
-    {
-        id: 4,
-        name: "Agile Project Management",
-        organization: "PMI",
-        completionDate: "December 10, 2025",
-        status: "completed",
-        learnerName: user.name,
-        category: "Management",
-    },
-];
+import { useState, useEffect } from "react";
+import useUserStore from "@/context/userStore";
+import useCertStore from "@/context/certificateStore";
 
 export default function CertificatesPage() {
     const [filter, setFilter] = useState("all");
     const [shareMenuOpen, setShareMenuOpen] = useState<number | null>(null);
+    const { user, token } = useUserStore();
+    const { certificates, loading, fetchCertificates } = useCertStore();
+
+    const certifications = [
+        {
+            id: 1,
+            name: "Advanced Web Development",
+            organization: "Tech Academy",
+            completionDate: "February 28, 2026",
+            status: "completed",
+            learnerName: user?.name,
+            category: "Development",
+        },
+        {
+            id: 2,
+            name: "Cloud Architecture Professional",
+            organization: "Cloud Certification Board",
+            completionDate: "January 15, 2026",
+            status: "completed",
+            learnerName: user?.name,
+            category: "Cloud",
+        },
+        {
+            id: 3,
+            name: "UX Design Specialist",
+            organization: "Design Institute",
+            completionDate: "March 2, 2026",
+            status: "completed",
+            learnerName: user?.name,
+            category: "Design",
+        },
+        {
+            id: 4,
+            name: "Agile Project Management",
+            organization: "PMI",
+            completionDate: "December 10, 2025",
+            status: "completed",
+            learnerName: user?.name,
+            category: "Management",
+        },
+    ];
+
+    useEffect(() => {
+        if (token) {
+            fetchCertificates(); // runs in background, stale certs show instantly
+        }
+    }, [token]);
 
     const handleDownloadCertificate = (certName: string) => {
         alert(`Downloading certificate: ${certName}`);
