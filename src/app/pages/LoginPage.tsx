@@ -1,7 +1,7 @@
 import { Trophy, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import authService from "@/services/auth";
+import authService from "@/services/authService";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -161,10 +161,10 @@ export default function LoginPage() {
 
                     <div className="rounded-2xl bg-white p-8 shadow-xl">
                         <div className="mb-8">
-                            <h2 className="mb-2 text-3xl font-bold text-gray-900">
+                            <h2 className="flex justify-center mb-2 text-3xl font-bold text-gray-900">
                                 Login
                             </h2>
-                            <p className="text-gray-600">
+                            <p className="flex justify-center text-gray-600">
                                 Enter your credentials to access your account
                             </p>
                         </div>

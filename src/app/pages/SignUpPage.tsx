@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import authService from "../../services/auth";
+import authService from "../../services/authService";
 
 export default function SignUpPage() {
     const [showPassword, setShowPassword] = useState(false);
