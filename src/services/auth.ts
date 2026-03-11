@@ -1,8 +1,8 @@
 import axios from "axios";
-import { ENDPOINTS } from "../utils/endpoints";
+import { ENDPOINTS } from "@/utils/endpoints";
 
 const authService = {
-    login: async (email, password) => {
+    login: async (email: string, password: string) => {
         try {
             const { login: LOGIN_URL } = ENDPOINTS;
             console.log("Sending login request to:", LOGIN_URL);
@@ -15,20 +15,25 @@ const authService = {
             return {
                 success: response.data.success,
                 data: response.data,
-                error: response.data.error || null,
+                error: response.data.message || null,
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 success: false,
                 error:
-                    error.response?.data?.error ||
+                    error.response?.data?.message ||
                     error.message ||
                     "Login failed",
             };
         }
     },
 
-    signup: async (name, email, phone, password) => {
+    signup: async (
+        name: string,
+        email: string,
+        phone: string,
+        password: string,
+    ) => {
         try {
             const { signup: SIGNUP_URL } = ENDPOINTS;
 
@@ -44,7 +49,7 @@ const authService = {
                 data: response.data,
                 error: response.data.error || null,
             };
-        } catch (error) {
+        } catch (error: any) {
             return {
                 success: false,
                 error:
