@@ -2,11 +2,13 @@ import { Trophy, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import authService from "@/services/authService";
+import useUserStore from "@/context/userStore";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
+    const { setAuth } = useUserStore();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
@@ -19,19 +21,12 @@ export default function LoginPage() {
 
         setLoading(true);
 
-        if (!email || !password) {
-            return;
-        }
-
         try {
             const response = await authService.login(email, password);
 
             if (response.success) {
-                localStorage.setItem("token", response.data.token);
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify(response.data.user),
-                );
+                const { token, user } = response.data;
+                setAuth(token, user);
                 navigate("/");
             } else {
                 if (response.data.message === "Invalid credentials") {
@@ -269,7 +264,7 @@ export default function LoginPage() {
                             <Button
                                 type="submit"
                                 size="lg"
-                                disabled={loading}
+                                disabled={loading || !email || !password}
                                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-6 font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                             >
                                 {loading ? (

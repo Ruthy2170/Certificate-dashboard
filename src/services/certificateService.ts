@@ -1,11 +1,12 @@
 import axios from "axios";
 import { ENDPOINTS } from "@/utils/endpoints";
+import useUserStore from "@/context/userStore";
 
 const certificateServices = {
     fetchCertificate: async (id: string) => {
         try {
             const { getCertificate } = ENDPOINTS;
-            const token = localStorage.getItem("token");
+            const { token } = useUserStore.getState();
 
             const certificate = await axios.get(
                 getCertificate.replace(":certificateId", id),
@@ -35,7 +36,7 @@ const certificateServices = {
     fetchCertificates: async () => {
         try {
             const { getCertificates } = ENDPOINTS;
-            const token = localStorage.getItem("token");
+            const { token } = useUserStore.getState();
 
             const certificates = await axios.get(getCertificates, {
                 headers: {

@@ -10,10 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router";
-
-// logo imported for future use
-
-const user = JSON.parse(localStorage.getItem("user") || "{}");
+import useUserStore from "@/context/userStore";
 
 // Mock data
 const userData = {
@@ -30,14 +27,14 @@ const navigationItems = [
 ];
 
 export default function Layout() {
+    const { user, logOut } = useUserStore();
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/login");
+        logOut();
         navigate("/login");
     };
 
@@ -79,16 +76,16 @@ export default function Layout() {
                     <div className="mx-4 mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 p-5">
                         <div className="mb-3 flex items-center gap-3">
                             <img
-                                src={user.avatar}
-                                alt={user.name}
+                                src={user?.avatar}
+                                alt={user?.name}
                                 className="size-14 rounded-full border-2 border-blue-100 object-cover shadow-md"
                             />
                             <div className="flex-1 overflow-hidden">
                                 <p className="truncate font-semibold text-white">
-                                    {user.name}
+                                    {user?.name}
                                 </p>
                                 <p className="truncate text-xs text-blue-100">
-                                    {user.email}
+                                    {user?.email}
                                 </p>
                             </div>
                         </div>
