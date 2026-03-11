@@ -1,25 +1,30 @@
 import { Trophy, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import authService from "../../services/auth";
+import authService from "@/services/auth";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate();
+    const [loginError, setLoginError] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e: React.SubmitEvent) => {
-        console.log("Attempting login with:");
         e.preventDefault();
+
+        setLoading(true);
+
         if (!email || !password) {
-            alert("Please enter your email and password");
             return;
         }
 
         try {
             const response = await authService.login(email, password);
-            console.log("Login response:", response);
 
             if (response.success) {
                 localStorage.setItem("token", response.data.token);
@@ -29,11 +34,22 @@ export default function LoginPage() {
                 );
                 navigate("/");
             } else {
-                alert(response.error);
+                if (response.data.message === "Invalid credentials") {
+                    setLoginError(true);
+                }
+                toast.error(response.error, {
+                    position: "top-center",
+                    style: { color: "red" },
+                });
             }
         } catch (error) {
             console.error("Login failed:", error);
-            alert("Something went wrong");
+            toast.error("Something went wrong", {
+                position: "top-center",
+                style: { color: "red" },
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -55,14 +71,19 @@ export default function LoginPage() {
             <div className="hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-blue-600 lg:to-purple-600 lg:p-12">
                 <div className="mx-auto max-w-md">
                     <div className="mb-8 flex items-center gap-3">
-                        <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
-                            <Trophy className="size-12 text-white" />
+                        <div className="rounded-xl bg-white/20 p-2 backdrop-blur-sm">
+                            <img
+                                src="/ambani-logo.png"
+                                className="h-12 w-12 rounded-sm"
+                            />
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-white">
                                 AchieveHub
                             </h1>
-                            <p className="text-blue-100">Learning Platform</p>
+                            <p className="text-blue-100">
+                                Digital Credentials Platform
+                            </p>
                         </div>
                     </div>
 
@@ -161,11 +182,17 @@ export default function LoginPage() {
                                     <input
                                         type="email"
                                         value={email}
-                                        onChange={(e) =>
-                                            setEmail(e.target.value)
-                                        }
+                                        onChange={(e) => {
+                                            setEmail(e.target.value);
+                                            setLoginError(false);
+                                        }}
                                         placeholder="you@example.com"
-                                        className="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-4 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        className={`w-full rounded-lg border py-3 pl-12 pr-4 transition-all focus:outline-none focus:ring-2 
+                                            ${
+                                                loginError
+                                                    ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500/20"
+                                            }`}
                                         required
                                     />
                                 </div>
@@ -185,11 +212,16 @@ export default function LoginPage() {
                                             showPassword ? "text" : "password"
                                         }
                                         value={password}
-                                        onChange={(e) =>
-                                            setPassword(e.target.value)
-                                        }
+                                        onChange={(e) => {
+                                            setPassword(e.target.value);
+                                            setLoginError(false);
+                                        }}
                                         placeholder="Enter your password"
-                                        className="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-12 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        className={`w-full rounded-lg border py-3 pl-12 pr-4 transition-all focus:outline-none focus:ring-2 ${
+                                            loginError
+                                                ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                : "border-gray-300 focus:border-blue-500 focus:ring-blue-500/20"
+                                        }`}
                                         required
                                     />
                                     <button
@@ -227,14 +259,31 @@ export default function LoginPage() {
                                 </button>
                             </div>
 
+                            {loginError && (
+                                <p className="flex justify-center text-sm text-red-500">
+                                    Invalid credentials
+                                </p>
+                            )}
+
                             {/* Sign In Button */}
-                            <button
+                            <Button
                                 type="submit"
-                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl"
+                                size="lg"
+                                disabled={loading}
+                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-6 font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                             >
-                                Login
-                                <ArrowRight className="size-5" />
-                            </button>
+                                {loading ? (
+                                    <>
+                                        <Spinner data-icon="inline-start" />
+                                        Loading...
+                                    </>
+                                ) : (
+                                    <>
+                                        Login
+                                        <ArrowRight className="size-5" />
+                                    </>
+                                )}
+                            </Button>
 
                             {/* Divider */}
                             <div className="relative">
