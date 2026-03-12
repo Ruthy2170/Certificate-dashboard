@@ -50,11 +50,18 @@ export default function ProfilePage() {
                     <div className="rounded-2xl bg-white p-6 shadow-lg">
                         <div className="mb-6 flex flex-col items-center">
                             <div className="relative mb-4">
-                                <img
-                                    src={user?.avatar}
-                                    alt={user?.name}
-                                    className="size-32 rounded-full border-4 border-blue-100 object-cover shadow-lg"
-                                />
+                                {user?.avatar ? (
+                                    <img
+                                        src={user.avatar}
+                                        alt={user?.name}
+                                        className="size-32 rounded-full border-4 border-blue-100 object-cover shadow-lg"
+                                    />
+                                ) : (
+                                    <div className="flex size-32 items-center justify-center rounded-full border-4 border-blue-100 bg-blue-500 text-4xl font-bold text-white shadow-lg">
+                                        {user?.name?.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+
                                 <button className="absolute bottom-0 right-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 p-2 text-white shadow-lg transition-all hover:shadow-xl">
                                     <Camera className="size-4" />
                                 </button>
