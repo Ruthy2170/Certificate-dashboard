@@ -5,4 +5,5 @@ export const ENDPOINTS = {
     signup: `${BASE_URL}/auth/register`,
     getCertificates: `${BASE_URL}/certificate/`,
     getCertificate: `${BASE_URL}/certificate/:certificateId`,
+    getOrganisation: `${BASE_URL}/organisation/:id/organisation`,
 };
