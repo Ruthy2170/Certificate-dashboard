@@ -92,7 +92,11 @@ export default function SignUpPage() {
                 <div className="mx-auto max-w-md">
                     <div className="mb-8 flex items-center gap-3">
                         <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
-                            <Trophy className="size-12 text-white" />
+                            <img
+                                src="/ambani-logo.png"
+                                alt="Logo"
+                                className="size-8"
+                            />
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-white">
@@ -113,7 +117,11 @@ export default function SignUpPage() {
                     <div className="space-y-6">
                         <div className="flex items-center gap-4 rounded-xl bg-white/10 p-4 backdrop-blur-sm">
                             <div className="flex size-12 items-center justify-center rounded-lg bg-white/20">
-                                <Trophy className="size-6 text-white" />
+                                <img
+                                    src="/achd.png"
+                                    alt="Logo"
+                                    className="size-8"
+                                />
                             </div>
                             <div>
                                 <p className="font-semibold text-white">
@@ -127,7 +135,11 @@ export default function SignUpPage() {
 
                         <div className="flex items-center gap-4 rounded-xl bg-white/10 p-4 backdrop-blur-sm">
                             <div className="flex size-12 items-center justify-center rounded-lg bg-white/20">
-                                <Mail className="size-6 text-white" />
+                                <img
+                                    src="/ambani-logo.png"
+                                    alt="Logo"
+                                    className="size-8"
+                                />
                             </div>
                             <div>
                                 <p className="font-semibold text-white">
