@@ -41,11 +41,14 @@ export default function Layout() {
     return (
         <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
             {/* Sidebar */}
+
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-72 transform bg-white shadow-xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+                className={`fixed inset-y-0 left-0 z-50 w-72 transform bg-white shadow-xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
             >
                 <div className="flex h-full flex-col">
-                    {/* Logo/Brand */}
+                    {/* Logo / Brand */}
                     <div className="flex items-center justify-between p-6">
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl bg-white p-2">
@@ -55,6 +58,7 @@ export default function Layout() {
                                     className="size-8"
                                 />
                             </div>
+
                             <div>
                                 <span className="block text-lg font-bold text-gray-900">
                                     AchieveHub
@@ -64,6 +68,7 @@ export default function Layout() {
                                 </span>
                             </div>
                         </div>
+
                         <button
                             onClick={() => setSidebarOpen(false)}
                             className="lg:hidden"
@@ -73,26 +78,36 @@ export default function Layout() {
                     </div>
 
                     {/* User Info */}
-                    <div className="mx-4 mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 p-5">
-                        <div className="mb-3 flex items-center gap-3">
-                            <img
-                                src={user?.avatar}
-                                alt={user?.name}
-                                className="size-14 rounded-full border-2 border-blue-100 object-cover shadow-md"
-                            />
+                    <div className="px-4 mb-5">
+                        <div className="flex items-center gap-3">
+                            {user?.avatar ? (
+                                <img
+                                    src={user?.avatar}
+                                    alt={user?.name}
+                                    className="size-14 rounded-full border-2 border-blue-100 object-cover shadow-md"
+                                />
+                            ) : (
+                                <div className="size-14 rounded-full border-2 border-blue-100 bg-blue-500 text-white flex items-center justify-center shadow-md font-semibold">
+                                    {user?.name?.charAt(0).toUpperCase()}
+                                </div>
+                            )}
+
                             <div className="flex-1 overflow-hidden">
-                                <p className="truncate font-semibold text-white">
+                                <p className="truncate font-semibold text-gray-900">
                                     {user?.name}
                                 </p>
-                                <p className="truncate text-xs text-blue-100">
+
+                                <p className="truncate text-xs text-gray-500">
                                     {user?.email}
                                 </p>
                             </div>
                         </div>
-                        <div className="mt-3 flex items-center justify-between rounded-lg bg-white/20 px-3 py-2 backdrop-blur-sm">
+
+                        {/* Streak */}
+                        <div className="mt-3 flex items-center justify-between rounded-lg bg-gray-100 px-3 py-2">
                             <div className="flex items-center gap-2">
-                                <Flame className="size-4 text-orange-300" />
-                                <span className="text-sm font-medium text-white">
+                                <Flame className="size-4 text-orange-400" />
+                                <span className="text-sm font-medium text-gray-700">
                                     {userData.currentStreak} Day Streak
                                 </span>
                             </div>
@@ -104,6 +119,7 @@ export default function Layout() {
                         {navigationItems.map((item) => {
                             const IconComponent = item.icon;
                             const isActive = location.pathname === item.path;
+
                             return (
                                 <button
                                     key={item.id}
