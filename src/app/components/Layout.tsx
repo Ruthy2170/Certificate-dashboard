@@ -78,7 +78,7 @@ export default function Layout() {
                     </div>
 
                     {/* User Info */}
-                    <div className="px-4 mb-5">
+                    <div className="mx-4 mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 p-5">
                         <div className="flex items-center gap-3">
                             {user?.avatar ? (
                                 <img
@@ -87,27 +87,27 @@ export default function Layout() {
                                     className="size-14 rounded-full border-2 border-blue-100 object-cover shadow-md"
                                 />
                             ) : (
-                                <div className="size-14 rounded-full border-2 border-blue-100 bg-blue-500 text-white flex items-center justify-center shadow-md font-semibold">
+                                <div className="size-14 rounded-full border-2 border-blue-100 bg-gray-200 text-blue-500 flex items-center justify-center shadow-md font-semibold">
                                     {user?.name?.charAt(0).toUpperCase()}
                                 </div>
                             )}
 
                             <div className="flex-1 overflow-hidden">
-                                <p className="truncate font-semibold text-gray-900">
+                                <p className="truncate font-semibold text-white">
                                     {user?.name}
                                 </p>
 
-                                <p className="truncate text-xs text-gray-500">
+                                <p className="truncate text-xs text-blue-100">
                                     {user?.email}
                                 </p>
                             </div>
                         </div>
 
                         {/* Streak */}
-                        <div className="mt-3 flex items-center justify-between rounded-lg bg-gray-100 px-3 py-2">
+                        <div className="mt-3 flex items-center justify-between rounded-lg bg-white/20 px-3 py-2 backdrop-blur-sm">
                             <div className="flex items-center gap-2">
-                                <Flame className="size-4 text-orange-400" />
-                                <span className="text-sm font-medium text-gray-700">
+                                <Flame className="size-4 text-orange-300" />
+                                <span className="text-sm font-medium text-white">
                                     {userData.currentStreak} Day Streak
                                 </span>
                             </div>

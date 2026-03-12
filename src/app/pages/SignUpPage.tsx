@@ -11,10 +11,18 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import authService from "../../services/authService";
+import useUserStore from "@/context/userStore";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
 
 export default function SignUpPage() {
+    const navigate = useNavigate();
+    const { setAuth } = useUserStore();
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -24,11 +32,11 @@ export default function SignUpPage() {
         confirmPassword: "",
     });
 
-    const [loading, setLoading] = useState(false);
+    const handleInputChange = (field: string, value: string) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+    };
 
-    const navigate = useNavigate();
-
-    const handleSignUp = async (e: React.FormEvent) => {
+    const handleSignUp = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
         setLoading(true);
@@ -42,18 +50,21 @@ export default function SignUpPage() {
             );
 
             if (response.success) {
-                localStorage.setItem("token", response.data.token);
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify(response.data.user),
-                );
+                const { token, user } = response.data;
+                setAuth(token, user);
                 navigate("/");
             } else {
-                alert(response.error);
+                toast.error(response.error, {
+                    position: "top-center",
+                    style: { color: "red" },
+                });
             }
         } catch (error) {
             console.error("Signup failed:", error);
-            alert("Something went wrong");
+            toast.error("Something went wrong", {
+                position: "top-center",
+                style: { color: "red" },
+            });
         } finally {
             setLoading(false);
         }
@@ -171,79 +182,194 @@ export default function SignUpPage() {
                         </div>
 
                         <form onSubmit={handleSignUp} className="space-y-5">
-                            <input
-                                type="text"
-                                placeholder="Full Name"
-                                value={formData.name}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        name: e.target.value,
-                                    })
-                                }
-                                className="w-full rounded-lg border border-gray-300 py-3 px-4"
-                            />
+                            {/* Full Name Field */}
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Full Name{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                        <User className="size-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "name",
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="Enter your full name"
+                                        className="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-4 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        required
+                                    />
+                                </div>
+                            </div>
 
-                            <input
-                                type="email"
-                                placeholder="Email"
-                                value={formData.email}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        email: e.target.value,
-                                    })
-                                }
-                                className="w-full rounded-lg border border-gray-300 py-3 px-4"
-                            />
+                            {/* Email Field */}
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Email Address{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                        <Mail className="size-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "email",
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="you@example.com"
+                                        className="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-4 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        required
+                                    />
+                                </div>
+                            </div>
 
-                            <input
-                                type="tel"
-                                placeholder="+27 80 000 0000"
-                                value={formData.phone}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        phone: e.target.value,
-                                    })
-                                }
-                                className="w-full rounded-lg border border-gray-300 py-3 px-4"
-                            />
+                            {/* Phone Field */}
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Phone Number
+                                </label>
+                                <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                        <Phone className="size-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "phone",
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="+27 80 000 0000"
+                                        className="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-4 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    />
+                                </div>
+                            </div>
 
-                            <input
-                                type="password"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        password: e.target.value,
-                                    })
-                                }
-                                className="w-full rounded-lg border border-gray-300 py-3 px-4"
-                            />
+                            {/* Password Field */}
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Password{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                        <Lock className="size-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
+                                        value={formData.password}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "password",
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="Create a strong password"
+                                        className="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-12 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowPassword(!showPassword)
+                                        }
+                                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="size-5" />
+                                        ) : (
+                                            <Eye className="size-5" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
 
-                            <input
-                                type="password"
-                                placeholder="Confirm Password"
-                                value={formData.confirmPassword}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        confirmPassword: e.target.value,
-                                    })
-                                }
-                                className="w-full rounded-lg border border-gray-300 py-3 px-4"
-                            />
+                            {/* Confirm Password Field */}
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Confirm Password{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                        <Lock className="size-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type={
+                                            showConfirmPassword
+                                                ? "text"
+                                                : "password"
+                                        }
+                                        value={formData.confirmPassword}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "confirmPassword",
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="Confirm your password"
+                                        className="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-12 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowConfirmPassword(
+                                                !showConfirmPassword,
+                                            )
+                                        }
+                                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600"
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff className="size-5" />
+                                        ) : (
+                                            <Eye className="size-5" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
 
-                            <button
+                            {/* Sign Up Button */}
+                            <Button
                                 type="submit"
-                                className="w-full rounded-lg py-3 font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600"
+                                size="lg"
+                                disabled={
+                                    loading ||
+                                    !formData.name ||
+                                    !formData.email ||
+                                    !formData.phone ||
+                                    !formData.password ||
+                                    !formData.confirmPassword
+                                }
+                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-6 font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                             >
-                                {loading
-                                    ? "Creating Account..."
-                                    : "Create Account"}
-                            </button>
+                                {loading ? (
+                                    <>
+                                        <Spinner data-icon="inline-start" />
+                                        Creating...
+                                    </>
+                                ) : (
+                                    <>
+                                        Create account
+                                        <ArrowRight className="size-5" />
+                                    </>
+                                )}
+                            </Button>
                         </form>
 
                         <div className="mt-8 text-center">
