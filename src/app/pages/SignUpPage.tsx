@@ -136,7 +136,7 @@ export default function SignUpPage() {
                         <div className="flex items-center gap-4 rounded-xl bg-white/10 p-4 backdrop-blur-sm">
                             <div className="flex size-12 items-center justify-center rounded-lg bg-white/20">
                                 <img
-                                    src="/ambani-logo.png"
+                                    src="/cert.png"
                                     alt="Logo"
                                     className="size-8"
                                 />
