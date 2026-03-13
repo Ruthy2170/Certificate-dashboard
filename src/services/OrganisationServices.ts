@@ -3,16 +3,19 @@ import { ENDPOINTS } from "@/utils/endpoints";
 import useUserStore from "@/context/userStore";
 
 const organisationServices = {
-    fetchOrganisation: async () => {
+    fetchOrganisation: async (id: string) => {
         try {
             const { getOrganisation } = ENDPOINTS;
             const { token } = useUserStore.getState();
 
-            const organisation = await axios.get(getOrganisation, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const organisation = await axios.get(
+                getOrganisation.replace(":id", id),
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 },
-            });
+            );
 
             return {
                 success: organisation.data.success,
