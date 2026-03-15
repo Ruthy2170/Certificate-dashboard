@@ -2,7 +2,6 @@ import {
     Award,
     Calendar,
     Download,
-    CheckCircle2,
     Filter,
     Share2,
     Linkedin,
@@ -13,96 +12,95 @@ import {
 import { useState, useEffect } from "react";
 import useUserStore from "@/context/userStore";
 import useCertStore from "@/context/certificateStore";
+import certificateServices from "@/services/certificateService";
+import { Certificate } from "@/types/Certificates";
+import { formatDate } from "@/utils/dateUtils";
+import { toast } from "sonner";
+import CardSkeleton from "@/app/components/cardSkeleton";
 
 export default function CertificatesPage() {
     const [filter, setFilter] = useState("all");
-    const [shareMenuOpen, setShareMenuOpen] = useState<number | null>(null);
+    const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null);
     const { user, token } = useUserStore();
-    const { certificates, loading, fetchCertificates } = useCertStore();
-
-    const certifications = [
-        {
-            id: 1,
-            name: "Advanced Web Development",
-            organization: "Tech Academy",
-            completionDate: "February 28, 2026",
-            status: "completed",
-            learnerName: user?.name,
-            category: "Development",
-        },
-        {
-            id: 2,
-            name: "Cloud Architecture Professional",
-            organization: "Cloud Certification Board",
-            completionDate: "January 15, 2026",
-            status: "completed",
-            learnerName: user?.name,
-            category: "Cloud",
-        },
-        {
-            id: 3,
-            name: "UX Design Specialist",
-            organization: "Design Institute",
-            completionDate: "March 2, 2026",
-            status: "completed",
-            learnerName: user?.name,
-            category: "Design",
-        },
-        {
-            id: 4,
-            name: "Agile Project Management",
-            organization: "PMI",
-            completionDate: "December 10, 2025",
-            status: "completed",
-            learnerName: user?.name,
-            category: "Management",
-        },
-    ];
+    const { certificates, fetchCertificates, loading } = useCertStore();
+    const orgs = [...new Set(certificates?.map((c) => c.organisationName))];
 
     useEffect(() => {
         if (token) {
-            fetchCertificates(); // runs in background, stale certs show instantly
+            fetchCertificates();
         }
-    }, [token]);
+    }, [token, fetchCertificates]);
 
-    const handleDownloadCertificate = (certName: string) => {
-        alert(`Downloading certificate: ${certName}`);
+    const handleDownloadCertificate = async (cert: Certificate) => {
+        toast.promise<{ name: string }>(
+            () =>
+                new Promise(async (resolve, reject) => {
+                    try {
+                        const response =
+                            await certificateServices.fetchCertificate(
+                                cert._id,
+                            );
+
+                        if (response.success) {
+                            const url = response.data.signedUrl;
+                            const link = document.createElement("a");
+                            link.href = url;
+                            link.target = "_blank";
+                            link.download = `${cert.courseName}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            resolve({ name: cert.courseName });
+                        } else {
+                            reject(new Error(response.error));
+                        }
+                    } catch (error) {
+                        console.error("Certificate download failed:", error);
+                        reject(error);
+                    }
+                }),
+            {
+                loading: "Downloading certificate...",
+                success: (data) =>
+                    `${data.name} certificate downloaded successfully`,
+                error: "Failed to download certificate",
+                position: "top-center",
+            },
+        );
     };
 
-    const handleShareToLinkedIn = (cert: (typeof certifications)[0]) => {
-        const text = `I'm excited to share that I've earned my ${cert.name} certification from ${cert.organization}! 🎓`;
+    const handleShareToLinkedIn = (cert: Certificate) => {
+        const text = `I'm excited to share that I've earned my ${cert.courseName} certification from ${cert.organisationName}! 🎓`;
         const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
         window.open(url, "_blank", "width=600,height=600");
         setShareMenuOpen(null);
     };
 
-    const handleShareToTwitter = (cert: (typeof certifications)[0]) => {
-        const text = `I'm excited to share that I've earned my ${cert.name} certification from ${cert.organization}! 🎓`;
+    const handleShareToTwitter = (cert: Certificate) => {
+        const text = `I'm excited to share that I've earned my ${cert.courseName} certification from ${cert.organisationName}! 🎓`;
         const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
         window.open(url, "_blank", "width=600,height=600");
         setShareMenuOpen(null);
     };
 
-    const handleShareToFacebook = (cert: (typeof certifications)[0]) => {
+    const handleShareToFacebook = (cert: Certificate) => {
         const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
         window.open(url, "_blank", "width=600,height=600");
         setShareMenuOpen(null);
     };
 
-    const handleCopyLink = (cert: (typeof certifications)[0]) => {
-        const certificateUrl = `${window.location.origin}/certificates/${cert.id}`;
+    const handleCopyLink = (cert: Certificate) => {
+        const certificateUrl = `${window.location.origin}/certificates/${cert._id}`;
         navigator.clipboard.writeText(certificateUrl).then(() => {
-            alert("Certificate link copied to clipboard!");
+            toast.info("Certificate link copied to clipboard!");
             setShareMenuOpen(null);
         });
     };
 
     const filteredCerts =
         filter === "all"
-            ? certifications
-            : certifications.filter(
-                  (cert) => cert.category.toLowerCase() === filter,
-              );
+            ? certificates
+            : certificates?.filter((cert) => cert.organisationName === filter);
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -117,7 +115,7 @@ export default function CertificatesPage() {
             </div>
 
             {/* Stats Overview */}
-            <div className="mb-8 grid gap-6 sm:grid-cols-3">
+            <div className="mb-8 grid gap-6 sm:grid-cols-2">
                 <div className="rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 shadow-lg">
                     <div className="mb-3 flex items-center justify-between">
                         <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
@@ -128,25 +126,7 @@ export default function CertificatesPage() {
                         Total Certificates
                     </p>
                     <p className="text-3xl font-bold text-white">
-                        {certifications.length}
-                    </p>
-                </div>
-
-                <div className="rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 shadow-lg">
-                    <div className="mb-3 flex items-center justify-between">
-                        <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
-                            <CheckCircle2 className="size-6 text-white" />
-                        </div>
-                    </div>
-                    <p className="mb-1 text-sm font-medium text-purple-100">
-                        Completed
-                    </p>
-                    <p className="text-3xl font-bold text-white">
-                        {
-                            certifications.filter(
-                                (c) => c.status === "completed",
-                            ).length
-                        }
+                        {certificates?.length}
                     </p>
                 </div>
 
@@ -161,8 +141,10 @@ export default function CertificatesPage() {
                     </p>
                     <p className="text-3xl font-bold text-white">
                         {
-                            certifications.filter((c) =>
-                                c.completionDate.includes("2026"),
+                            certificates?.filter((c) =>
+                                c.issuedAt.includes(
+                                    String(new Date().getFullYear()),
+                                ),
                             ).length
                         }
                     </p>
@@ -183,179 +165,165 @@ export default function CertificatesPage() {
                     >
                         All
                     </button>
-                    <button
-                        onClick={() => setFilter("development")}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                            filter === "development"
-                                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                    >
-                        Development
-                    </button>
-                    <button
-                        onClick={() => setFilter("cloud")}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                            filter === "cloud"
-                                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                    >
-                        Cloud
-                    </button>
-                    <button
-                        onClick={() => setFilter("design")}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                            filter === "design"
-                                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                    >
-                        Design
-                    </button>
-                    <button
-                        onClick={() => setFilter("management")}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                            filter === "management"
-                                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                    >
-                        Management
-                    </button>
+                    {orgs?.map((orgName) => (
+                        <button
+                            key={orgName}
+                            onClick={() => setFilter(orgName)}
+                            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                                filter === orgName
+                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                        >
+                            {orgName}
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Certificates Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-                {filteredCerts.map((cert) => (
-                    <div
-                        key={cert.id}
-                        className="group rounded-xl border-2 border-gray-100 bg-gradient-to-br from-white to-gray-50 p-6 transition-all hover:border-blue-200 hover:shadow-lg"
-                    >
-                        <div className="mb-4 flex items-start justify-between">
-                            <div className="flex size-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
-                                <Award className="size-7 text-white" />
+                {loading && certificates.length === 0 ? (
+                    <>
+                        <CardSkeleton />
+                        <CardSkeleton />
+                    </>
+                ) : (
+                    filteredCerts?.map((cert: Certificate) => (
+                        <div
+                            key={cert._id}
+                            className="group rounded-xl border-2 border-gray-300 bg-gradient-to-br from-white to-gray-50 p-6 shadow-c transition-all hover:border-blue-200 hover:shadow-lg"
+                        >
+                            <div className="mb-4 flex items-start justify-between">
+                                <div className="flex size-14 items-center justify-center rounded-xl shadow-lg">
+                                    <img src={cert.organisationLogo} sizes="" />
+                                </div>
                             </div>
-                            <span className="rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700">
-                                ✓ Completed
-                            </span>
-                        </div>
-                        <h3 className="mb-2 font-bold text-gray-900">
-                            {cert.name}
-                        </h3>
-                        <p className="mb-2 text-sm font-medium text-blue-600">
-                            Awarded to: {cert.learnerName}
-                        </p>
-                        <p className="mb-2 text-sm font-medium text-gray-600">
-                            {cert.organization}
-                        </p>
-                        <div className="mb-2 inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700">
-                            {cert.category}
-                        </div>
-                        <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
-                            <Calendar className="size-4" />
-                            {cert.completionDate}
-                        </div>
+                            <h3 className="mb-2 font-bold text-gray-900">
+                                {cert.courseName}
+                            </h3>
+                            <p className="mb-2 text-sm font-medium text-blue-600">
+                                Awarded to: {user?.name}
+                            </p>
+                            <p className="mb-2 text-sm font-medium text-gray-600">
+                                {cert.organisationName}
+                            </p>
+                            <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
+                                <Calendar className="size-4" />
+                                {formatDate(cert.issuedAt)}
+                            </div>
 
-                        {/* Action Buttons */}
-                        <div className="space-y-3">
-                            <button
-                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl"
-                                onClick={() =>
-                                    handleDownloadCertificate(cert.name)
-                                }
-                            >
-                                <Download className="size-4" />
-                                Download Certificate
-                            </button>
-
-                            {/* Share Button with Dropdown */}
-                            <div className="relative">
+                            {/* Action Buttons */}
+                            <div className="space-y-3">
                                 <button
-                                    className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-600 transition-all hover:border-blue-300 hover:bg-blue-50"
+                                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                                     onClick={() =>
-                                        setShareMenuOpen(
-                                            shareMenuOpen === cert.id
-                                                ? null
-                                                : cert.id,
-                                        )
+                                        handleDownloadCertificate(cert)
                                     }
                                 >
-                                    <Share2 className="size-4" />
-                                    Share Certificate
+                                    <Download className="size-4" />
+                                    Download Certificate
                                 </button>
 
-                                {/* Share Dropdown Menu */}
-                                {shareMenuOpen === cert.id && (
-                                    <>
-                                        {/* Backdrop */}
-                                        <div
-                                            className="fixed inset-0 z-10"
-                                            onClick={() =>
-                                                setShareMenuOpen(null)
-                                            }
-                                        />
+                                {/* Share Button with Dropdown */}
+                                <div className="relative">
+                                    <button
+                                        className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-600 transition-all hover:border-blue-300 hover:bg-blue-50"
+                                        onClick={() =>
+                                            setShareMenuOpen(
+                                                shareMenuOpen === cert._id
+                                                    ? null
+                                                    : cert._id,
+                                            )
+                                        }
+                                    >
+                                        <Share2 className="size-4" />
+                                        Share Certificate
+                                    </button>
 
-                                        {/* Menu */}
-                                        <div className="absolute right-0 top-full z-20 mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
-                                            <button
-                                                className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50"
+                                    {/* Share Dropdown Menu */}
+                                    {shareMenuOpen === cert._id && (
+                                        <>
+                                            {/* Backdrop */}
+                                            <div
+                                                className="fixed inset-0 z-10"
                                                 onClick={() =>
-                                                    handleShareToLinkedIn(cert)
+                                                    setShareMenuOpen(null)
                                                 }
-                                            >
-                                                <div className="flex size-8 items-center justify-center rounded-lg bg-[#0077B5]">
-                                                    <Linkedin className="size-4 text-white" />
-                                                </div>
-                                                <span>Share on LinkedIn</span>
-                                            </button>
+                                            />
 
-                                            <button
-                                                className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50"
-                                                onClick={() =>
-                                                    handleShareToTwitter(cert)
-                                                }
-                                            >
-                                                <div className="flex size-8 items-center justify-center rounded-lg bg-[#1DA1F2]">
-                                                    <Twitter className="size-4 text-white" />
-                                                </div>
-                                                <span>Share on Twitter</span>
-                                            </button>
+                                            {/* Menu */}
+                                            <div className="absolute right-0 top-full z-20 mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl">
+                                                <button
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50"
+                                                    onClick={() =>
+                                                        handleShareToLinkedIn(
+                                                            cert,
+                                                        )
+                                                    }
+                                                >
+                                                    <div className="flex size-8 items-center justify-center rounded-lg bg-[#0077B5]">
+                                                        <Linkedin className="size-4 text-white" />
+                                                    </div>
+                                                    <span>
+                                                        Share on LinkedIn
+                                                    </span>
+                                                </button>
 
-                                            <button
-                                                className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50"
-                                                onClick={() =>
-                                                    handleShareToFacebook(cert)
-                                                }
-                                            >
-                                                <div className="flex size-8 items-center justify-center rounded-lg bg-[#1877F2]">
-                                                    <Facebook className="size-4 text-white" />
-                                                </div>
-                                                <span>Share on Facebook</span>
-                                            </button>
+                                                <button
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50"
+                                                    onClick={() =>
+                                                        handleShareToTwitter(
+                                                            cert,
+                                                        )
+                                                    }
+                                                >
+                                                    <div className="flex size-8 items-center justify-center rounded-lg bg-[#1DA1F2]">
+                                                        <Twitter className="size-4 text-white" />
+                                                    </div>
+                                                    <span>
+                                                        Share on Twitter
+                                                    </span>
+                                                </button>
 
-                                            <button
-                                                className="flex w-full items-center gap-3 border-t border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                                                onClick={() =>
-                                                    handleCopyLink(cert)
-                                                }
-                                            >
-                                                <div className="flex size-8 items-center justify-center rounded-lg bg-gray-100">
-                                                    <Link className="size-4 text-gray-600" />
-                                                </div>
-                                                <span>Copy Link</span>
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
+                                                <button
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50"
+                                                    onClick={() =>
+                                                        handleShareToFacebook(
+                                                            cert,
+                                                        )
+                                                    }
+                                                >
+                                                    <div className="flex size-8 items-center justify-center rounded-lg bg-[#1877F2]">
+                                                        <Facebook className="size-4 text-white" />
+                                                    </div>
+                                                    <span>
+                                                        Share on Facebook
+                                                    </span>
+                                                </button>
+
+                                                <button
+                                                    className="flex w-full items-center gap-3 border-t border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                                                    onClick={() =>
+                                                        handleCopyLink(cert)
+                                                    }
+                                                >
+                                                    <div className="flex size-8 items-center justify-center rounded-lg bg-gray-100">
+                                                        <Link className="size-4 text-gray-600" />
+                                                    </div>
+                                                    <span>Copy Link</span>
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
 
-            {filteredCerts.length === 0 && (
+            {!loading && filteredCerts?.length === 0 && (
                 <div className="rounded-xl bg-white p-12 text-center shadow-sm">
                     <Award className="mx-auto mb-4 size-16 text-gray-300" />
                     <p className="text-gray-600">

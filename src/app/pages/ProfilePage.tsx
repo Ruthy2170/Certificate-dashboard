@@ -9,12 +9,14 @@ import {
     Edit2,
 } from "lucide-react";
 import { useState } from "react";
-import { format } from "date-fns";
 import useUserStore from "@/context/userStore";
+import useCertStore from "@/context/certificateStore";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function ProfilePage() {
     const { user } = useUserStore();
     const [isEditing, setIsEditing] = useState(false);
+    const { certificates } = useCertStore();
 
     const handleInputChange = (field: string, value: string) => {
         // setProfileData((prev) => ({ ...prev, [field]: value }));
@@ -24,12 +26,6 @@ export default function ProfilePage() {
         setIsEditing(false);
         // In a real app, this would save to a backend
         alert("Profile updated successfully!");
-    };
-
-    const formateDate = (date: string) => {
-        const formattedDate = format(date, "LLLL dd, yyyy");
-
-        return formattedDate;
     };
 
     return (
@@ -77,7 +73,7 @@ export default function ProfilePage() {
                                 <span>
                                     Joined{" "}
                                     {user?.createdAt
-                                        ? formateDate(user?.createdAt)
+                                        ? formatDate(user?.createdAt)
                                         : "Unavailable"}
                                 </span>
                             </div>
@@ -100,7 +96,9 @@ export default function ProfilePage() {
                                 <span className="text-sm text-blue-100">
                                     Certificates
                                 </span>
-                                <span className="text-xl font-bold">4</span>
+                                <span className="text-xl font-bold">
+                                    {certificates.length}
+                                </span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-blue-100">
