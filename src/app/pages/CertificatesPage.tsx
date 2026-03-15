@@ -16,7 +16,7 @@ import certificateServices from "@/services/certificateService";
 import { Certificate } from "@/types/Certificates";
 import { formatDate } from "@/utils/dateUtils";
 import { toast } from "sonner";
-import CardSkeleton from "@/app/components/cardSkeleton";
+import CardSkeleton from "@/app/components/CardSkeleton";
 
 export default function CertificatesPage() {
     const [filter, setFilter] = useState("all");
