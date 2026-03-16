@@ -80,6 +80,7 @@ export default function SignUpPage() {
                         <div className="rounded-xl bg-white/20 p-2 backdrop-blur-sm">
                             <img
                                 src="/ambani-logo.png"
+                                alt="logo"
                                 className="h-12 w-12 rounded-sm"
                             />
                         </div>
