@@ -9,12 +9,14 @@ import {
     Edit2,
 } from "lucide-react";
 import { useState } from "react";
-import { format } from "date-fns";
 import useUserStore from "@/context/userStore";
+import useCertStore from "@/context/certificateStore";
+import { formatDate } from "@/utils/dateUtils";
 
 export default function ProfilePage() {
     const { user } = useUserStore();
     const [isEditing, setIsEditing] = useState(false);
+    const { certificates } = useCertStore();
 
     const handleInputChange = (field: string, value: string) => {
         // setProfileData((prev) => ({ ...prev, [field]: value }));
@@ -24,12 +26,6 @@ export default function ProfilePage() {
         setIsEditing(false);
         // In a real app, this would save to a backend
         alert("Profile updated successfully!");
-    };
-
-    const formateDate = (date: string) => {
-        const formattedDate = format(date, "LLLL dd, yyyy");
-
-        return formattedDate;
     };
 
     return (
@@ -50,12 +46,19 @@ export default function ProfilePage() {
                     <div className="rounded-2xl bg-white p-6 shadow-lg">
                         <div className="mb-6 flex flex-col items-center">
                             <div className="relative mb-4">
-                                <img
-                                    src={user?.avatar}
-                                    alt={user?.name}
-                                    className="size-32 rounded-full border-4 border-blue-100 object-cover shadow-lg"
-                                />
-                                <button className="absolute bottom-0 right-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 p-2 text-white shadow-lg transition-all hover:shadow-xl">
+                                {user?.avatar ? (
+                                    <img
+                                        src={user.avatar}
+                                        alt={user?.name}
+                                        className="size-32 rounded-full border-4 border-blue-100 object-cover shadow-lg"
+                                    />
+                                ) : (
+                                    <div className="flex size-32 items-center justify-center rounded-full border-4 border-blue-100 bg-gradient-to-r from-blue-600 to-purple-600 text-4xl font-bold text-white shadow-lg">
+                                        {user?.name?.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+
+                                <button className="absolute bottom-0 right-0 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 p-2 text-white shadow-lg transition-all hover:shadow-xl">
                                     <Camera className="size-4" />
                                 </button>
                             </div>
@@ -70,7 +73,7 @@ export default function ProfilePage() {
                                 <span>
                                     Joined{" "}
                                     {user?.createdAt
-                                        ? formateDate(user?.createdAt)
+                                        ? formatDate(user?.createdAt)
                                         : "Unavailable"}
                                 </span>
                             </div>
@@ -93,7 +96,9 @@ export default function ProfilePage() {
                                 <span className="text-sm text-blue-100">
                                     Certificates
                                 </span>
-                                <span className="text-xl font-bold">4</span>
+                                <span className="text-xl font-bold">
+                                    {certificates.length}
+                                </span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-blue-100">

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types/User";
+import useCertStore from "./certificateStore";
 
 interface AuthState {
     token: string | null;
@@ -15,7 +16,10 @@ const useUserStore = create<AuthState>()(
             token: null,
             user: null,
             setAuth: (token, user) => set({ token, user }),
-            logOut: () => set({ token: null, user: null }),
+            logOut: () => {
+                useCertStore.getState().clearCertificates();
+                set({ token: null, user: null });
+            },
         }),
         {
             name: "auth-storage",
