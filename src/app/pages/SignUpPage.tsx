@@ -124,11 +124,9 @@ export default function SignUpPage() {
 
                         <div className="flex items-center gap-4 rounded-xl bg-white/10 p-4 backdrop-blur-sm">
                             <div className="flex size-12 items-center justify-center rounded-lg bg-white/20">
-                                <img
-                                    src="/ambani-logo.png"
-                                    alt="Logo"
-                                    className="size-8"
-                                />
+                                <div className="flex size-12 items-center justify-center rounded-lg bg-white/20">
+                                    <Mail className="size-6 text-white" />
+                                </div>
                             </div>
                             <div>
                                 <p className="font-semibold text-white">
