@@ -106,11 +106,7 @@ export default function SignUpPage() {
                     <div className="space-y-6">
                         <div className="flex items-center gap-4 rounded-xl bg-white/10 p-4 backdrop-blur-sm">
                             <div className="flex size-12 items-center justify-center rounded-lg bg-white/20">
-                                <img
-                                    src="/achd.png"
-                                    alt="Logo"
-                                    className="size-8"
-                                />
+                                <Trophy className="size-6 text-white" />
                             </div>
                             <div>
                                 <p className="font-semibold text-white">
