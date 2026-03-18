@@ -8,24 +8,84 @@ import {
     Camera,
     Edit2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useUserStore from "@/context/userStore";
 import useCertStore from "@/context/certificateStore";
+import authService from "@/services/authService";
 import { formatDate } from "@/utils/dateUtils";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
-    const { user } = useUserStore();
+    const { user, token, setAuth } = useUserStore();
     const [isEditing, setIsEditing] = useState(false);
     const { certificates } = useCertStore();
 
+    const [formData, setFormData] = useState({
+        name: user?.name || "",
+        email: user?.email || "",
+        avatar: user?.avatar || "",
+        phone: user?.phone || "",
+        country: user?.country || "",
+    });
+
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                name: user.name || "",
+                email: user.email || "",
+                avatar: user.avatar || "",
+                phone: user.phone || "",
+                country: user.country || "",
+            });
+        }
+    }, [user]);
+
     const handleInputChange = (field: string, value: string) => {
-        // setProfileData((prev) => ({ ...prev, [field]: value }));
+        setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleSave = () => {
-        setIsEditing(false);
-        // In a real app, this would save to a backend
-        alert("Profile updated successfully!");
+    const handleSave = async () => {
+        if (!token) return;
+
+        try {
+            const updates: any = {};
+
+            if (formData.name !== user?.name) updates.name = formData.name;
+            if (formData.email !== user?.email) updates.email = formData.email;
+            if (formData.avatar !== user?.avatar)
+                updates.avatar = formData.avatar;
+            if (formData.phone !== user?.phone) updates.phone = formData.phone;
+            if (formData.country !== user?.country)
+                updates.country = formData.country;
+
+            // 🚨 prevent empty request
+            if (Object.keys(updates).length === 0) {
+                toast.info("No changes made", { position: "top-center" });
+                return;
+            }
+
+            const response = await authService.updateDetails(updates);
+
+            if (response.success) {
+                setAuth(token, response.data.data); // ✅ update global state
+                setIsEditing(false);
+
+                toast.success("Details successfully updated", {
+                    position: "top-center",
+                });
+            } else {
+                toast.error(response.error, {
+                    position: "top-center",
+                    style: { color: "red" },
+                });
+            }
+        } catch (error) {
+            console.error("Update failed:", error);
+            toast.error("Something went wrong", {
+                position: "top-center",
+                style: { color: "red" },
+            });
+        }
     };
 
     return (
@@ -140,7 +200,7 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="text"
-                                        value={user?.name}
+                                        value={formData.name}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 "name",
@@ -165,7 +225,7 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="email"
-                                        value={user?.email}
+                                        value={formData.email}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 "email",
@@ -190,7 +250,7 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="tel"
-                                        value={user?.phone}
+                                        value={formData.phone}
                                         onChange={(e) =>
                                             handleInputChange(
                                                 "phone",
@@ -215,10 +275,10 @@ export default function ProfilePage() {
                                 {isEditing ? (
                                     <input
                                         type="text"
-                                        value={user?.province}
+                                        value={formData.country}
                                         onChange={(e) =>
                                             handleInputChange(
-                                                "location",
+                                                "country",
                                                 e.target.value,
                                             )
                                         }
@@ -226,7 +286,7 @@ export default function ProfilePage() {
                                     />
                                 ) : (
                                     <p className="rounded-lg bg-gray-50 px-4 py-3 text-gray-900">
-                                        {user?.province}, {user?.country}
+                                        {user?.country}
                                     </p>
                                 )}
                             </div>
