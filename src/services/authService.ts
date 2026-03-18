@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ENDPOINTS } from "@/utils/endpoints";
+import useUserStore from "@/context/userStore";
 
 const authService = {
     login: async (email: string, password: string) => {
@@ -55,6 +56,37 @@ const authService = {
                     error.response?.data?.error ||
                     error.message ||
                     "Login failed",
+            };
+        }
+    },
+
+    updateDetails: async (fields: {
+        name?: string;
+        email?: string;
+        avatar?: string;
+    }) => {
+        try {
+            const { updateDetails: updateURL } = ENDPOINTS;
+            const { token } = useUserStore.getState();
+
+            const response = await axios.patch(updateURL, fields, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            return {
+                success: response.data.success,
+                data: response.data,
+                error: response.data.message || null,
+            };
+        } catch (error: any) {
+            return {
+                success: false,
+                error:
+                    error.response?.data?.message ||
+                    error.message ||
+                    "update unsuccessful",
             };
         }
     },
