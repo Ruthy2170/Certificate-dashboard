@@ -28,6 +28,34 @@ const authService = {
         }
     },
 
+    googleAuth: async (credential: string) => {
+        try {
+            const { googleAuth } = ENDPOINTS;
+            const response = await axios.post(
+                googleAuth,
+                { credential },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+            return {
+                success: response.data.success,
+                data: response.data,
+                error: response.data.error || null,
+            };
+        } catch (error: any) {
+            return {
+                success: false,
+                error:
+                    error.response?.data?.error ||
+                    error.message ||
+                    "Login failed",
+            };
+        }
+    },
+
     signup: async (
         name: string,
         email: string,
